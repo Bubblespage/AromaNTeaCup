@@ -1,15 +1,16 @@
 .app-container {
-  max-width: 100%;
+  max-width: 1280px;
   margin: 0 auto;
   min-height: 100vh;
   background-color: var(--color-background);
   position: relative;
-  padding-bottom: 80px; 
+  padding-bottom: 80px;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.08);
 }
 
 .container {
   width: 100%;
-  max-width: 1600px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -20,6 +21,8 @@
   z-index: 100;
   background-color: var(--color-surface);
   border-bottom: 1px solid rgba(0,0,0,0.05);
+  max-width: 1280px;
+  margin: 0 auto;
 }
 
 .header-container {
@@ -315,6 +318,7 @@
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
+  max-width: 1280px;
   display: flex;
   justify-content: space-around;
   padding: 16px 16px 24px;
