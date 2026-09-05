@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+:root {
+  --color-background: #FAF8F5; /* Soft Cream */
+  --color-text: #2D1B14; /* Deep Espresso */
+  --color-primary: #D49A44; /* Caramel Gold */
+  --color-secondary: #E8DCC4; /* Warm Sand */
+  --color-surface: #FFFFFF; /* Pure White */
+  
+  --font-main: 'Plus Jakarta Sans', sans-serif;
+  --font-heading: 'Playfair Display', serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--color-background);
+  /* Premium subtle texture/gradient */
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(38, 55%, 85%, 0.4) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, hsla(38, 55%, 85%, 0.4) 0px, transparent 50%);
+  background-attachment: fixed;
+  color: var(--color-text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, .logo, .modal-title, .section-title, .auth-brand {
+  font-family: var(--font-heading);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
