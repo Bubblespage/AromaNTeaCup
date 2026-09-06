@@ -9,12 +9,12 @@ export default function OrderTracker({ isOpen, onClose, currentUser }) {
   useEffect(() => {
     if (!isOpen) return;
 
-    let q;
-    if (currentUser) {
-      q = query(collection(db, 'orders'), where('userId', '==', currentUser.uid), orderBy('date', 'desc'), limit(1));
-    } else {
-      q = query(collection(db, 'orders'), orderBy('date', 'desc'), limit(1));
+    if (!currentUser) {
+      setLatestOrder(null);
+      return;
     }
+
+    const q = query(collection(db, 'orders'), where('userId', '==', currentUser.uid), orderBy('date', 'desc'), limit(1));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
       if (!snapshot.empty) {
