@@ -18,7 +18,7 @@ const ZONES = {
   ]
 };
 
-export default function CheckoutModal({ isOpen, onClose, cartItems, onOrderSuccess, onOpenTracker }) {
+export default function CheckoutModal({ isOpen, onClose, cartItems, onOrderSuccess, onOpenTracker, currentUser }) {
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedZone, setSelectedZone] = useState('Carsadang Bago II');
@@ -64,6 +64,7 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onOrderSucce
         total,
         date: new Date().toISOString(),
         status: 'Preparing',
+        userId: currentUser?.uid || null,
       };
 
       await setDoc(doc(db, 'orders', num), orderData);

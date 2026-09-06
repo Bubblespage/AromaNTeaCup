@@ -29,24 +29,24 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
+  padding: 12px 16px;
 }
 
 .logo-container {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
 }
 
 .header-logo-img {
-  height: 60px;
-  width: 60px;
+  height: 40px;
+  width: 40px;
   border-radius: 50%;
   object-fit: cover;
 }
 
 .logo {
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 800;
   letter-spacing: -0.5px;
   color: var(--color-text);
@@ -73,7 +73,7 @@
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
 }
 
 .icon-btn {
@@ -94,7 +94,7 @@
 .cart-btn {
   background: none;
   position: relative;
-  padding: 8px;
+  padding: 4px;
   transition: transform 0.2s;
 }
 .cart-btn:hover {
@@ -365,6 +365,15 @@
     padding: 24px 40px;
   }
 
+  .logo-container {
+    gap: 16px;
+  }
+
+  .header-logo-img {
+    height: 60px;
+    width: 60px;
+  }
+
   .logo {
     font-size: 2.2rem;
     font-weight: 800;
@@ -479,26 +488,41 @@
 .user-menu {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 4px;
 }
 
 .user-avatar {
-  width: 38px;
-  height: 38px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background-color: var(--color-primary);
   color: white;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.9rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .user-name {
-  font-weight: 600;
-  font-size: 1rem;
-  color: var(--color-text);
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .user-menu {
+    gap: 10px;
+  }
+  .user-avatar {
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
+  }
+  .user-name {
+    display: block;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-text);
+  }
 }
 
 .sign-out-btn {
@@ -3567,4 +3591,303 @@
   background: var(--color-primary);
   color: white;
   transform: translateY(-2px);
+}
+
+/* ===== MOBILE LAYOUT FIXES ===== */
+@media (max-width: 767px) {
+  /* Fix Header Text Wrapping & Spacing */
+  .header-container {
+    padding: 8px 12px !important;
+  }
+  
+  .logo-container {
+    gap: 6px !important;
+  }
+  
+  .header-logo-img {
+    height: 32px !important;
+    width: 32px !important;
+  }
+
+  .logo {
+    white-space: nowrap;
+    font-size: 0.8rem !important;
+    letter-spacing: -0.5px !important;
+  }
+  
+  .user-name {
+    display: none !important;
+  }
+  
+  .header-actions {
+    gap: 4px !important;
+  }
+  
+  .header-actions button {
+    padding: 2px !important;
+  }
+  
+  .header-actions svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  
+  .user-avatar {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 0.8rem !important;
+  }
+
+  /* Make tracker modal not fit the screen */
+  .tracker-modal-wide {
+    width: calc(100% - 32px) !important;
+    margin: 16px auto !important;
+    max-width: none;
+    border-radius: 20px !important;
+    height: auto !important;
+    max-height: calc(100vh - 32px);
+  }
+
+  /* Make cart drawer not fit the screen (leave margin on the left) */
+  .cart-drawer {
+    width: calc(100% - 32px) !important;
+    right: 0;
+  }
+
+  /* Mobile Tracker Modal Compression */
+  .tracker-header-wide {
+    padding: 16px 20px 8px !important;
+  }
+  
+  .tracker-header-wide h2 {
+    font-size: 1.2rem !important;
+    margin-bottom: 2px !important;
+  }
+  
+  .tracker-content-wide {
+    padding: 0 20px 16px !important;
+  }
+  
+  .tracker-timeline-box {
+    padding: 12px !important;
+    gap: 8px !important;
+  }
+  
+  .tracker-row {
+    gap: 12px !important;
+  }
+  
+  .tr-icon-box {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  
+  .tr-text-box h4 {
+    font-size: 0.85rem !important;
+    margin-bottom: 0 !important;
+  }
+  
+  .tr-text-box p {
+    font-size: 0.75rem !important;
+  }
+  
+  .tr-connector {
+    height: 12px !important;
+    margin: 2px 0 2px 12.5px !important; /* Centers under 28px icon */
+  }
+  
+  .tracker-footer-wide {
+    padding: 12px 20px !important;
+  }
+}
+
+/* ===== DESKTOP CHECKOUT MODAL COMPRESSION (PREVENT SCROLLING) ===== */
+@media (min-width: 768px) {
+  .checkout-full-layout {
+    max-height: 98vh; /* Allow it to take up more of the screen */
+  }
+  
+  .co-header-full {
+    padding: 16px 32px !important;
+  }
+  
+  .co-body-full {
+    padding: 20px 32px !important;
+    gap: 24px !important;
+  }
+  
+  .co-left-col,
+  .co-right-col {
+    gap: 16px !important;
+  }
+  
+  .co-section-block {
+    gap: 8px !important;
+  }
+  
+  .co-input-wrapper input,
+  .textarea-wrapper textarea,
+  .co-payment-btn,
+  .co-action-btn {
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+  }
+
+  .co-breakdown {
+    padding: 16px 20px !important;
+    gap: 8px !important;
+  }
+  
+  .co-footer-full {
+    padding: 16px 32px !important;
+  }
+
+  /* GCash Modal Compression */
+  .gcash-full-modal {
+    max-height: 98vh;
+  }
+  
+  .gcash-header {
+    padding: 16px 32px 0 !important;
+  }
+  
+  .gcash-content {
+    padding: 16px 32px 24px !important;
+  }
+  
+  .gcash-subtitle-2 {
+    margin-bottom: 16px !important;
+  }
+  
+  .gcash-qr-box {
+    margin-bottom: 16px !important;
+  }
+  
+  .gcash-qr-box img {
+    width: 200px !important;
+    height: 200px !important;
+  }
+  
+  .gcash-amount-text {
+    font-size: 1.8rem !important;
+    margin-bottom: 16px !important;
+  }
+  
+  .gcash-ref-container {
+    margin-bottom: 12px !important;
+    padding: 10px 16px !important;
+  }
+  
+  .gcash-upload-btn-new {
+    margin-bottom: 16px !important;
+    padding: 12px !important;
+  }
+  
+  .gcash-btn-cancel,
+  .gcash-btn-submit {
+    padding: 14px !important;
+  }
+
+  /* Success Modal Compression */
+  .co-success-card {
+    padding: 24px 32px !important;
+    max-height: 98vh;
+  }
+  
+  .co-success-icon {
+    width: 64px !important;
+    height: 64px !important;
+  }
+  
+  .co-success-card h2 {
+    font-size: 1.6rem !important;
+    margin-bottom: 4px !important;
+  }
+  
+  .co-success-sub {
+    margin-bottom: 16px !important;
+    font-size: 0.9rem !important;
+  }
+  
+  .co-receipt-box {
+    margin-bottom: 12px !important;
+  }
+  
+  .co-receipt-header {
+    padding: 12px !important;
+  }
+  
+  .co-receipt-body {
+    padding: 16px !important;
+    gap: 8px !important;
+  }
+
+  /* Tracker Modal Compression & "Cute" Sizing */
+  .tracker-modal-wide {
+    max-width: 440px !important;
+  }
+  
+  .tracker-header-wide {
+    padding: 16px 24px 8px !important;
+  }
+  
+  .tracker-header-wide h2 {
+    font-size: 1.3rem !important;
+    margin-bottom: 2px !important;
+  }
+  
+  .tracker-content-wide {
+    padding: 0 24px 16px !important;
+  }
+  
+  .tracker-timeline-box {
+    padding: 16px !important;
+    gap: 8px !important;
+  }
+  
+  .tracker-row {
+    gap: 12px !important;
+  }
+  
+  .tr-icon-box {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  
+  .tr-text-box h4 {
+    font-size: 0.9rem !important;
+    margin-bottom: 0 !important;
+  }
+  
+  .tr-text-box p {
+    font-size: 0.8rem !important;
+  }
+  
+  .tr-connector {
+    height: 12px !important;
+    margin: 2px 0 2px 14.5px !important; /* Centers under 32px icon */
+  }
+  
+  .tracker-footer-wide {
+    padding: 12px 24px !important;
+  }
+
+  /* AuthModal Compression */
+  .auth-split-layout {
+    min-height: 500px !important;
+  }
+  
+  .auth-form-side {
+    padding: 24px 32px !important;
+  }
+  
+  .form-group input, 
+  .input-wrapper input {
+    padding: 12px 16px !important;
+  }
+  
+  .auth-submit-btn {
+    padding: 14px !important;
+    min-height: 48px !important;
+  }
 }

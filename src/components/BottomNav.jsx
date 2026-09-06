@@ -1,6 +1,6 @@
-import { Home, Coffee, User, PhoneCall } from 'lucide-react';
+import { Home, Coffee, User, PhoneCall, Info } from 'lucide-react';
 
-export default function BottomNav({ onHome, onMenu, onProfile, onContact }) {
+export default function BottomNav({ onHome, onMenu, onProfile, onContact, onAbout }) {
   return (
     <nav className="bottom-nav glass">
       <button className="nav-item" onClick={onHome}>
@@ -18,6 +18,10 @@ export default function BottomNav({ onHome, onMenu, onProfile, onContact }) {
       <button className="nav-item" onClick={onContact}>
         <PhoneCall size={24} />
         <span>Contact</span>
+      </button>
+      <button className="nav-item" onClick={onAbout}>
+        <Info size={24} />
+        <span>About</span>
       </button>
     </nav>
   );

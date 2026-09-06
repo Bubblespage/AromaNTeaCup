@@ -1,15 +1,21 @@
 import { useEffect, useState } from 'react';
 import { X, RefreshCcw, Receipt, Coffee, Car, Home } from 'lucide-react';
 import { db } from '../firebase';
-import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { collection, query, orderBy, limit, onSnapshot, where } from 'firebase/firestore';
 
-export default function OrderTracker({ isOpen, onClose }) {
+export default function OrderTracker({ isOpen, onClose, currentUser }) {
   const [latestOrder, setLatestOrder] = useState(null);
 
   useEffect(() => {
     if (!isOpen) return;
 
-    const q = query(collection(db, 'orders'), orderBy('date', 'desc'), limit(1));
+    let q;
+    if (currentUser) {
+      q = query(collection(db, 'orders'), where('userId', '==', currentUser.uid), orderBy('date', 'desc'), limit(1));
+    } else {
+      q = query(collection(db, 'orders'), orderBy('date', 'desc'), limit(1));
+    }
+    
     const unsubscribe = onSnapshot(q, (snapshot) => {
       if (!snapshot.empty) {
         const doc = snapshot.docs[0];
@@ -20,7 +26,7 @@ export default function OrderTracker({ isOpen, onClose }) {
     });
 
     return () => unsubscribe();
-  }, [isOpen]);
+  }, [isOpen, currentUser]);
 
   if (!isOpen) return null;
 

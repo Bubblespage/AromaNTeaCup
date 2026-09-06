@@ -110,7 +110,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
           {/* Left Side: Image / Branding for Desktop */}
           <div className="auth-brand-side">
             <div className="auth-brand-overlay">
-              <Coffee size={48} className="auth-brand-icon" />
+              <img src="/logo.jpg" alt="Aroma N Tea Cup Logo" className="auth-brand-icon" style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover' }} />
               <h2>Aroma N Tea Cup</h2>
               <p>Experience the finest blends crafted just for you.</p>
             </div>
@@ -120,8 +120,8 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
           {/* Right Side: Form */}
           <div className="auth-form-side">
             <div className="auth-header-mobile">
-              <div className="auth-logo">
-                <Coffee size={24} />
+              <div className="auth-logo" style={{ background: 'transparent' }}>
+                <img src="/logo.jpg" alt="Aroma N Tea Cup Logo" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
               </div>
               <span className="auth-brand">Aroma N Tea Cup</span>
             </div>

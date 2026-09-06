@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, ListOrdered, LogOut, Search, Clock, CheckCircle, Package, Layers } from 'lucide-react';
+import { LayoutDashboard, ListOrdered, LogOut, Search, Clock, CheckCircle, Package, Layers, X } from 'lucide-react';
 import { db } from '../firebase';
-import { collection, onSnapshot, doc, updateDoc } from 'firebase/firestore';
-import { menuItems } from '../data';
+import { collection, onSnapshot, doc, updateDoc, setDoc, getDocs, deleteDoc } from 'firebase/firestore';
 
 export default function AdminDashboard({ onSignOut }) {
   const [activeTab, setActiveTab] = useState('live_orders');
   const [orders, setOrders] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [productForm, setProductForm] = useState({ name: '', price: '₱', category: 'Frappe', image: '' });
 
   useEffect(() => {
     const ordersRef = collection(db, 'orders');
-    const unsubscribe = onSnapshot(ordersRef, (snapshot) => {
+    const unsubscribeOrders = onSnapshot(ordersRef, (snapshot) => {
       const fetchedOrders = [];
       snapshot.forEach((doc) => {
         fetchedOrders.push({ id: doc.id, ...doc.data() });
@@ -20,8 +23,59 @@ export default function AdminDashboard({ onSignOut }) {
       setOrders(fetchedOrders);
     });
 
-    return () => unsubscribe();
+    const productsRef = collection(db, 'products');
+    const unsubscribeProducts = onSnapshot(productsRef, (snapshot) => {
+      const fetchedProducts = [];
+      snapshot.forEach((doc) => {
+        fetchedProducts.push({ id: doc.id, ...doc.data() });
+      });
+      setProducts(fetchedProducts);
+    });
+
+    return () => {
+      unsubscribeOrders();
+      unsubscribeProducts();
+    };
   }, []);
+
+  const handleOpenAdd = () => {
+    setEditingProduct(null);
+    setProductForm({ name: '', price: '₱', category: 'Frappe', image: '' });
+    setIsProductModalOpen(true);
+  };
+
+  const handleOpenEdit = (product) => {
+    setEditingProduct(product);
+    setProductForm(product);
+    setIsProductModalOpen(true);
+  };
+
+  const handleDeleteProduct = async (id) => {
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      try {
+        await deleteDoc(doc(db, 'products', id.toString()));
+      } catch (err) {
+        console.error("Error deleting product: ", err);
+        alert("Failed to delete product.");
+      }
+    }
+  };
+
+  const handleSaveProduct = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingProduct) {
+        await updateDoc(doc(db, 'products', editingProduct.id.toString()), productForm);
+      } else {
+        const newId = Date.now().toString();
+        await setDoc(doc(db, 'products', newId), { id: newId, ...productForm });
+      }
+      setIsProductModalOpen(false);
+    } catch (err) {
+      console.error("Error saving product: ", err);
+      alert("Failed to save product.");
+    }
+  };
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
@@ -140,8 +194,10 @@ export default function AdminDashboard({ onSignOut }) {
           {activeTab === 'batch_menu' && (
             <div className="admin-menu-table">
               <div className="table-header">
-                <h3>Current Menu Items</h3>
-                <button className="add-menu-btn">+ Add Item</button>
+                <h3>Current Menu Items ({products.length})</h3>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button className="add-menu-btn" onClick={handleOpenAdd}>+ Add Item</button>
+                </div>
               </div>
               <div className="table-container">
                 <table>
@@ -155,18 +211,23 @@ export default function AdminDashboard({ onSignOut }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {menuItems.map(item => (
+                    {products.map(item => (
                       <tr key={item.id}>
                         <td><img src={item.image} alt={item.name} className="table-img" /></td>
                         <td><strong>{item.name}</strong></td>
                         <td><span className="table-cat-badge">{item.category}</span></td>
                         <td>{item.price}</td>
                         <td>
-                          <button className="table-action-btn edit">Edit</button>
-                          <button className="table-action-btn delete">Delete</button>
+                          <button className="table-action-btn edit" onClick={() => handleOpenEdit(item)}>Edit</button>
+                          <button className="table-action-btn delete" onClick={() => handleDeleteProduct(item.id)}>Delete</button>
                         </td>
                       </tr>
                     ))}
+                    {products.length === 0 && (
+                      <tr>
+                        <td colSpan="5" style={{ textAlign: 'center', padding: '20px' }}>No products found. Please seed the database.</td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -174,6 +235,66 @@ export default function AdminDashboard({ onSignOut }) {
           )}
         </div>
       </main>
+
+      {/* Product Modal */}
+      {isProductModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsProductModalOpen(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setIsProductModalOpen(false)}>
+              <X size={24} />
+            </button>
+            <h2 className="modal-title">{editingProduct ? 'Edit Product' : 'Add New Product'}</h2>
+            <form className="auth-form" style={{ marginTop: '20px' }} onSubmit={handleSaveProduct}>
+              <div className="form-group">
+                <label>Product Name</label>
+                <input 
+                  type="text" 
+                  value={productForm.name} 
+                  onChange={(e) => setProductForm({...productForm, name: e.target.value})} 
+                  required 
+                  placeholder="e.g. Mocha Frappe" 
+                />
+              </div>
+              <div className="form-group">
+                <label>Price</label>
+                <input 
+                  type="text" 
+                  value={productForm.price} 
+                  onChange={(e) => setProductForm({...productForm, price: e.target.value})} 
+                  required 
+                  placeholder="e.g. ₱89" 
+                />
+              </div>
+              <div className="form-group">
+                <label>Category</label>
+                <select 
+                  style={{ width: '100%', padding: '14px 16px', border: '1.5px solid #e8e3df', borderRadius: '14px', fontSize: '1rem', background: '#fafafa' }}
+                  value={productForm.category} 
+                  onChange={(e) => setProductForm({...productForm, category: e.target.value})}
+                >
+                  <option value="Frappe">Frappe</option>
+                  <option value="Iced Coffee">Iced Coffee</option>
+                  <option value="Hot Coffee">Hot Coffee</option>
+                  <option value="Pastries">Pastries</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Image URL or Path</label>
+                <input 
+                  type="text" 
+                  value={productForm.image} 
+                  onChange={(e) => setProductForm({...productForm, image: e.target.value})} 
+                  required 
+                  placeholder="e.g. /mocha_frappe.jpg" 
+                />
+              </div>
+              <button type="submit" className="auth-submit-btn" style={{ marginTop: '20px' }}>
+                {editingProduct ? 'Save Changes' : 'Add Product'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,30 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, RefreshCw, Clock, Coffee, ShoppingBag } from 'lucide-react';
-import { menuItems } from '../data';
+import { db } from '../firebase';
+import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 
-export default function UserDashboard({ onSignOut, onReorder, onBack }) {
-  // Mock order history data
-  const mockOrders = [
-    {
-      id: 'ORD-7742',
-      date: '2023-11-20T08:30:00',
-      status: 'Delivered',
-      total: 510,
-      items: [
-        { ...menuItems[0], qty: 1, cartPrice: 295, customizations: { size: 'Large', addons: [] } },
-        { ...menuItems[10], qty: 1 }
-      ]
-    },
-    {
-      id: 'ORD-6511',
-      date: '2023-11-15T14:15:00',
-      status: 'Delivered',
-      total: 260,
-      items: [
-        { ...menuItems[7], qty: 1 } // Iced Vanilla Latte
-      ]
-    }
-  ];
+export default function UserDashboard({ onSignOut, onReorder, onBack, currentUser }) {
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const q = query(
+      collection(db, 'orders'),
+      where('userId', '==', currentUser.uid),
+      orderBy('date', 'desc')
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const fetchedOrders = [];
+      snapshot.forEach((doc) => {
+        fetchedOrders.push({ id: doc.id, ...doc.data() });
+      });
+      setOrders(fetchedOrders);
+    });
+
+    return () => unsubscribe();
+  }, [currentUser]);
+
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--color-background)', paddingBottom: '60px' }}>
@@ -49,7 +50,7 @@ export default function UserDashboard({ onSignOut, onReorder, onBack }) {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          {mockOrders.map(order => (
+          {orders.map(order => (
             <div key={order.id} style={{ background: 'white', borderRadius: '20px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #f0ece9', paddingBottom: '16px' }}>
                 <div>
@@ -78,7 +79,7 @@ export default function UserDashboard({ onSignOut, onReorder, onBack }) {
                       {item.customizations && (
                         <div style={{ fontSize: '0.85rem', color: '#8a7f7b' }}>
                           Size: {item.customizations.size}
-                          {item.customizations.addons.map(a => `, +${a}`)}
+                          {item.customizations.addons?.map(a => `, +${a}`)}
                         </div>
                       )}
                     </div>
@@ -96,6 +97,13 @@ export default function UserDashboard({ onSignOut, onReorder, onBack }) {
               </button>
             </div>
           ))}
+          {orders.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '40px', background: 'white', borderRadius: '24px' }}>
+              <ShoppingBag size={48} color="#c0b8b5" style={{ marginBottom: '16px' }} />
+              <h3>No orders yet</h3>
+              <p style={{ color: '#8a7f7b' }}>When you place orders, they will appear here.</p>
+            </div>
+          )}
         </div>
       </main>
     </div>

@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Coffee } from 'lucide-react';
 import './App.css';
-import { categories, menuItems } from './data';
+import { categories } from './data';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import CategoryNav from './components/CategoryNav';
@@ -15,6 +15,9 @@ import AdminDashboard from './components/AdminDashboard';
 import UserDashboard from './components/UserDashboard';
 import AboutModal from './components/AboutModal';
 import CustomizationModal from './components/CustomizationModal';
+import { auth, db } from './firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { collection, onSnapshot, doc, setDoc } from 'firebase/firestore';
 
 function App() {
   const [activeCategory, setActiveCategory] = useState('All');
@@ -32,8 +35,59 @@ function App() {
   const [selectedItemForCustomization, setSelectedItemForCustomization] = useState(null);
   const [editingCartItemId, setEditingCartItemId] = useState(null);
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
+  const [authInitialized, setAuthInitialized] = useState(false);
+  const [products, setProducts] = useState([]);
 
-  const filteredItems = menuItems.filter(item => {
+  useEffect(() => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in
+        setCurrentUser({
+          name: user.displayName || 'User',
+          email: user.email,
+          uid: user.uid,
+          role: user.email === 'admin@aroma.com' ? 'admin' : 'user'
+        });
+      } else {
+        // User is signed out
+        setCurrentUser(null);
+      }
+      setAuthInitialized(true);
+    });
+
+    const productsRef = collection(db, 'products');
+    const unsubscribeProducts = onSnapshot(productsRef, (snapshot) => {
+      const fetchedProducts = [];
+      snapshot.forEach((doc) => {
+        // Parse ID back to number for legacy compatibility if needed, 
+        // but it's better to keep it as string from Firestore.
+        // The mock data used numbers, so we parse it to avoid breaking other logic.
+        fetchedProducts.push({ id: isNaN(Number(doc.id)) ? doc.id : Number(doc.id), ...doc.data() });
+      });
+      setProducts(fetchedProducts);
+    });
+
+    return () => {
+      unsubscribeAuth();
+      unsubscribeProducts();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!currentUser) {
+      setFavorites([]);
+      return;
+    }
+    const userDocRef = doc(db, 'users', currentUser.uid);
+    const unsubscribe = onSnapshot(userDocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setFavorites(docSnap.data().favorites || []);
+      }
+    });
+    return () => unsubscribe();
+  }, [currentUser]);
+
+  const filteredItems = products.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
     if (activeCategory === 'Favorites') {
       return favorites.includes(item.id) && matchesSearch;
@@ -85,10 +139,22 @@ function App() {
     setIsCartOpen(true);
   };
 
-  const handleToggleFavorite = (id) => {
-    setFavorites(prev => 
-      prev.includes(id) ? prev.filter(fId => fId !== id) : [...prev, id]
-    );
+  const handleToggleFavorite = async (id) => {
+    if (!currentUser) {
+      alert("Please sign in to save your favorites!");
+      return;
+    }
+    const newFavorites = favorites.includes(id) 
+      ? favorites.filter(fId => fId !== id) 
+      : [...favorites, id];
+      
+    setFavorites(newFavorites);
+
+    try {
+      await setDoc(doc(db, 'users', currentUser.uid), { favorites: newFavorites }, { merge: true });
+    } catch (err) {
+      console.error("Error saving favorite:", err);
+    }
   };
 
   const handleRemoveOne = (id) => {
@@ -120,10 +186,19 @@ function App() {
     setIsAuthOpen(false);
   };
 
-  const handleSignOut = () => {
-    setCurrentUser(null);
-    setIsDashboardOpen(false);
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      setCurrentUser(null);
+      setIsDashboardOpen(false);
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
+
+  if (!authInitialized) {
+    return <div className="app-loading">Loading...</div>; // Or a proper spinner
+  }
 
   if (currentUser?.role === 'admin') {
     return <AdminDashboard onSignOut={handleSignOut} />;
@@ -139,6 +214,7 @@ function App() {
           setIsDashboardOpen(false);
           setIsCartOpen(true);
         }}
+        currentUser={currentUser}
       />
     );
   }
@@ -233,6 +309,7 @@ function App() {
             element.scrollIntoView({ behavior: 'smooth' });
           }
         }}
+        onAbout={() => setIsAboutOpen(true)}
       />
       <AuthModal
         isOpen={isAuthOpen}
@@ -255,10 +332,12 @@ function App() {
         cartItems={cartItems}
         onOrderSuccess={handleOrderSuccess}
         onOpenTracker={() => setIsTrackerOpen(true)}
+        currentUser={currentUser}
       />
       <OrderTracker
         isOpen={isTrackerOpen}
         onClose={() => setIsTrackerOpen(false)}
+        currentUser={currentUser}
       />
       <AboutModal
         isOpen={isAboutOpen}
