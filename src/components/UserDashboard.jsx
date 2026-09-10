@@ -11,8 +11,7 @@ export default function UserDashboard({ onSignOut, onReorder, onBack, currentUse
 
     const q = query(
       collection(db, 'orders'),
-      where('userId', '==', currentUser.uid),
-      orderBy('date', 'desc')
+      where('userId', '==', currentUser.uid)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -20,6 +19,8 @@ export default function UserDashboard({ onSignOut, onReorder, onBack, currentUse
       snapshot.forEach((doc) => {
         fetchedOrders.push({ id: doc.id, ...doc.data() });
       });
+      // Sort chronologically (newest first) locally to bypass missing index
+      fetchedOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
       setOrders(fetchedOrders);
     });
 

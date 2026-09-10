@@ -1,10 +1,15 @@
 import { useEffect, useState } from 'react';
-import { X, RefreshCcw, Receipt, Coffee, Car, Home } from 'lucide-react';
+import { X, RefreshCcw, FileText, Coffee, Car, Home } from 'lucide-react';
 import { db } from '../firebase';
 import { collection, query, orderBy, limit, onSnapshot, where } from 'firebase/firestore';
 
 export default function OrderTracker({ isOpen, onClose, currentUser }) {
   const [latestOrder, setLatestOrder] = useState(null);
+
+  const handleBrowseMenu = () => {
+    onClose();
+    document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -14,16 +19,18 @@ export default function OrderTracker({ isOpen, onClose, currentUser }) {
       return;
     }
 
-    const q = query(collection(db, 'orders'), where('userId', '==', currentUser.uid), orderBy('date', 'desc'), limit(1));
+    const q = query(collection(db, 'orders'), where('userId', '==', currentUser.uid));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
       if (!snapshot.empty) {
-        const doc = snapshot.docs[0];
-        setLatestOrder({ id: doc.id, ...doc.data() });
+        const docs = [];
+        snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
+        docs.sort((a, b) => new Date(b.date) - new Date(a.date));
+        setLatestOrder(docs[0]);
       } else {
         setLatestOrder(null);
       }
-    });
+    }, (err) => console.error("OrderTracker Error:", err));
 
     return () => unsubscribe();
   }, [isOpen, currentUser]);
@@ -65,7 +72,7 @@ export default function OrderTracker({ isOpen, onClose, currentUser }) {
                   {/* Step 1: Received (Always Completed if we have an order) */}
                   <div className="tracker-row completed">
                     <div className="tr-icon-box">
-                      <Receipt size={20} />
+                      <FileText size={20} />
                     </div>
                     <div className="tr-text-box">
                       <h4>Order Received</h4>
@@ -75,7 +82,7 @@ export default function OrderTracker({ isOpen, onClose, currentUser }) {
                   <div className="tr-connector completed-line"></div>
 
                   {/* Step 2: Preparing */}
-                  <div className={`tracker-row ${latestOrder.status === 'Preparing' ? 'active' : 'completed'}`}>
+                  <div className={`tracker-row ${latestOrder.status === 'Verify GCash' ? 'pending' : (latestOrder.status === 'Preparing' ? 'active' : 'completed')}`}>
                     <div className={`tr-icon-box ${latestOrder.status === 'Preparing' ? 'pulsing' : ''}`}>
                       <Coffee size={20} />
                     </div>
@@ -84,7 +91,7 @@ export default function OrderTracker({ isOpen, onClose, currentUser }) {
                       <p>Barista is crafting your order...</p>
                     </div>
                   </div>
-                  <div className={`tr-connector ${latestOrder.status !== 'Preparing' ? 'completed-line' : ''}`}></div>
+                  <div className={`tr-connector ${['Out for Delivery', 'Delivered'].includes(latestOrder.status) ? 'completed-line' : ''}`}></div>
 
                   {/* Step 3: Out for Delivery */}
                   <div className={`tracker-row ${latestOrder.status === 'Out for Delivery' ? 'active' : (latestOrder.status === 'Delivered' ? 'completed' : 'pending')}`}>
@@ -124,7 +131,7 @@ export default function OrderTracker({ isOpen, onClose, currentUser }) {
                 <Coffee size={48} opacity={0.2} />
                 <h3>No Active Orders</h3>
                 <p>You haven't placed any orders yet.</p>
-                <button className="tracker-shop-btn" onClick={onClose}>
+                <button className="tracker-shop-btn" onClick={handleBrowseMenu}>
                   Browse Menu
                 </button>
               </div>

@@ -36,10 +36,8 @@ export const menuItems = [
   // --- HOT COFFEE ---
   { id: 24, name: 'Americano', price: '₱50', category: 'Hot Coffee', image: '/black_hot_1788603011976.jpg' },
   { id: 25, name: 'French Vanilla Hot', price: '₱75', category: 'Hot Coffee', image: '/vanilla_hot_1788603164515.jpg' },
-  { id: 26, name: 'Cafe Mocha Hot', price: '₱75', category: 'Hot Coffee', image: '/mocha_hot_1788603176709.jpg' },
   { id: 27, name: 'Cafe Latte', price: '₱75', category: 'Hot Coffee', image: '/vanilla_hot_1788603164515.jpg' },
   { id: 28, name: 'Salted Caramel Hot', price: '₱85', category: 'Hot Coffee', image: '/caramel_hot_1788603319348.jpg' },
-  { id: 29, name: 'Hazelnut Mocha Hot', price: '₱85', category: 'Hot Coffee', image: '/mocha_hot_1788603176709.jpg' },
 
   // --- PASTRIES ---
   { id: 30, name: 'Chocolate Cake Loaf', price: '₱180', category: 'Pastries', image: imgs.cake },

@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react';
 import { X, MapPin, User, Phone, Home, ChevronRight, CheckCircle, Package, Star, Calendar, Info, ChevronLeft, QrCode, Image } from 'lucide-react';
-import { db } from '../firebase';
+import { db, storage } from '../firebase';
 import { doc, setDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const DELIVERY_FEE = 60;
 
@@ -51,23 +52,31 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onOrderSucce
     setIsLoading(true);
     
     try {
-      const num = `ATC-${Date.now().toString().slice(-6)}`;
-      setOrderNumber(num);
+      const num = Date.now().toString().slice(-6);
+      setOrderNumber(`ATC-${num}`);
       
+      let screenshotUrl = null;
+      if (screenshot) {
+        const screenshotRef = ref(storage, `receipts/ATC-${num}-${Date.now()}`);
+        await uploadBytes(screenshotRef, screenshot);
+        screenshotUrl = await getDownloadURL(screenshotRef);
+      }
+
       const orderData = {
-        id: num,
+        id: `ATC-${num}`,
         items: cartItems,
         customer: form,
         refNumber: refNumber || null,
+        screenshotUrl: screenshotUrl || null,
         subtotal,
         deliveryFee: DELIVERY_FEE,
         total,
         date: new Date().toISOString(),
-        status: 'Preparing',
+        status: form.paymentMethod === 'gcash' ? 'Verify GCash' : 'Preparing',
         userId: currentUser?.uid || null,
       };
 
-      await setDoc(doc(db, 'orders', num), orderData);
+      await setDoc(doc(db, 'orders', `ATC-${num}`), orderData);
 
       setIsLoading(false);
       setStep(4);

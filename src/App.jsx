@@ -34,9 +34,15 @@ function App() {
   const [isCustomizationOpen, setIsCustomizationOpen] = useState(false);
   const [selectedItemForCustomization, setSelectedItemForCustomization] = useState(null);
   const [editingCartItemId, setEditingCartItemId] = useState(null);
-  const [isDashboardOpen, setIsDashboardOpen] = useState(false);
+  const [isDashboardOpen, setIsDashboardOpen] = useState(() => {
+    return localStorage.getItem('isDashboardOpen') === 'true';
+  });
   const [authInitialized, setAuthInitialized] = useState(false);
   const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    localStorage.setItem('isDashboardOpen', isDashboardOpen);
+  }, [isDashboardOpen]);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -59,12 +65,19 @@ function App() {
     const unsubscribeProducts = onSnapshot(productsRef, (snapshot) => {
       const fetchedProducts = [];
       snapshot.forEach((doc) => {
-        // Parse ID back to number for legacy compatibility if needed, 
-        // but it's better to keep it as string from Firestore.
-        // The mock data used numbers, so we parse it to avoid breaking other logic.
         fetchedProducts.push({ id: isNaN(Number(doc.id)) ? doc.id : Number(doc.id), ...doc.data() });
       });
-      setProducts(fetchedProducts);
+      
+      // Seed database if empty
+      if (fetchedProducts.length === 0) {
+        import('./data').then(({ menuItems }) => {
+          menuItems.forEach(item => {
+            setDoc(doc(db, 'products', item.id.toString()), item);
+          });
+        });
+      } else {
+        setProducts(fetchedProducts);
+      }
     });
 
     return () => {
@@ -86,6 +99,16 @@ function App() {
     });
     return () => unsubscribe();
   }, [currentUser]);
+
+  useEffect(() => {
+    // Automatically open dashboard if user navigates to /admin
+    if (authInitialized && window.location.pathname === '/admin') {
+      setIsDashboardOpen(true);
+      if (!currentUser) {
+        setIsAuthOpen(true);
+      }
+    }
+  }, [authInitialized, currentUser]);
 
   const filteredItems = products.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());

@@ -3,6 +3,11 @@ import { X, Minus, Plus, ShoppingBag, Trash2, ChevronRight, Pencil } from 'lucid
 export default function CartDrawer({ isOpen, onClose, cartItems, onAdd, onRemove, onDelete, onCheckout, onEdit }) {
   const DELIVERY_FEE = 60;
 
+  const handleBrowseMenu = () => {
+    onClose();
+    document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   const subtotal = cartItems.reduce((sum, item) => {
     const itemPrice = item.cartPrice || parseInt(item.price.replace('₱', '').replace(',', ''));
     return sum + itemPrice * item.qty;
@@ -39,7 +44,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onAdd, onRemove
               </div>
               <p>Your cart is empty</p>
               <span>Add something delicious from our menu!</span>
-              <button className="browse-btn" onClick={onClose}>Browse Menu</button>
+              <button className="browse-btn" onClick={handleBrowseMenu}>Browse Menu</button>
             </div>
           ) : (
             cartItems.map(item => (
