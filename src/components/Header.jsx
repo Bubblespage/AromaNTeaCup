@@ -42,7 +42,7 @@ export default function Header({ cartCount, onOpenAuth, onOpenAbout, currentUser
               ref={inputRef}
               type="text"
               className="search-bar-input"
-              placeholder="Search coffee, pastries..."
+              placeholder="Search coffee, snacks..."
               value={query}
               onChange={handleSearch}
             />

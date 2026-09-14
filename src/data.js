@@ -1,4 +1,4 @@
-export const categories = ['Favorites', 'All', 'Frappe', 'Iced Coffee', 'Hot Coffee', 'Pastries'];
+export const categories = ['Favorites', 'All', 'Frappe', 'Iced Coffee', 'Hot Coffee', 'Snacks'];
 
 const imgs = {
   frappe: '/frappe_drink_1788523503782.jpg',
@@ -10,38 +10,34 @@ const imgs = {
 
 export const menuItems = [
   // --- FRAPPE ---
-  { id: 1, name: 'Caramel Macchiato Frappe', price: '₱89', category: 'Frappe', image: '/caramel_frappe_1788524208307.jpg' },
-  { id: 2, name: 'Oreo Cheesecake', price: '₱89', category: 'Frappe', image: '/oreo_frappe_1788602741814.jpg' },
-  { id: 3, name: 'Mocha Cookie Crumble', price: '₱89', category: 'Frappe', image: '/mocha_frappe_1788602893315.jpg' },
-  { id: 4, name: 'Tripple Dark Chocolate', price: '₱89', category: 'Frappe', image: '/mocha_frappe_1788602893315.jpg' },
-  { id: 6, name: 'Salted Caramel Frappe', price: '₱89', category: 'Frappe', image: '/caramel_frappe_1788524208307.jpg' },
-  { id: 7, name: 'Dark Caramel', price: '₱89', category: 'Frappe', image: '/caramel_frappe_1788524208307.jpg' },
-  { id: 8, name: 'Mocha Frappe', price: '₱89', category: 'Frappe', image: '/mocha_frappe_1788602893315.jpg' },
+  { id: 1, name: 'Caramel Macchiato Frappe', price: '₱165', category: 'Frappe', image: '/caramel_macchiato_frappe.jpg' },
+  { id: 2, name: 'Oreo Cheesecake', price: '₱165', category: 'Frappe', image: '/oreo_cheesecake.jpg' },
+  { id: 3, name: 'Mocha Cookie Crumble', price: '₱165', category: 'Frappe', image: '/mocha_cookie.jpg' },
+  { id: 4, name: 'Tripple Dark Chocolate', price: '₱165', category: 'Frappe', image: '/tripple_dark_choco.jpg' },
+  { id: 6, name: 'Salted Caramel Frappe', price: '₱165', category: 'Frappe', image: '/salted_caramel_frappe.jpg' },
+  { id: 7, name: 'Dark Caramel', price: '₱165', category: 'Frappe', image: '/frappe_2.jpg' },
+  { id: 8, name: 'Mocha Frappe', price: '₱165', category: 'Frappe', image: '/mocha_frappe.jpg' },
 
   // --- ICED BLENDED (Moved to Frappe) ---
-  { id: 10, name: 'Choco Java Chips', price: '₱89', category: 'Frappe', image: '/rocky_road_1788602920272.jpg' },
-  { id: 12, name: 'Cookies & Cream', price: '₱89', category: 'Frappe', image: '/oreo_frappe_1788602741814.jpg' },
-  { id: 13, name: 'Dark Chocolate', price: '₱89', category: 'Frappe', image: '/mocha_frappe_1788602893315.jpg' },
-  { id: 15, name: 'Hershey', price: '₱89', category: 'Frappe', image: '/mocha_frappe_1788602893315.jpg' },
+  { id: 10, name: 'Choco Java Chips', price: '₱165', category: 'Frappe', image: '/frappe_3.jpg' },
+  { id: 12, name: 'Cookies & Cream', price: '₱165', category: 'Frappe', image: '/frappe_4.jpg' },
+  { id: 13, name: 'Dark Chocolate', price: '₱165', category: 'Frappe', image: '/dark_chocolate.jpg' },
 
   // --- ICED COFFEE ---
-  { id: 17, name: 'Salted Caramel Iced', price: '₱85', category: 'Iced Coffee', image: '/caramel_iced_1788602932720.jpg' },
-  { id: 18, name: 'Hazelnut Mocha Iced', price: '₱85', category: 'Iced Coffee', image: '/mocha_iced_1788602984203.jpg' },
-  { id: 19, name: 'Hazelnut Caramel', price: '₱85', category: 'Iced Coffee', image: '/caramel_iced_1788602932720.jpg' },
-  { id: 20, name: 'Caramel Macchiato Iced', price: '₱85', category: 'Iced Coffee', image: '/caramel_iced_1788602932720.jpg' },
-  { id: 21, name: 'White Cheesecake', price: '₱85', category: 'Iced Coffee', image: '/white_iced_1788602996843.jpg' },
-  { id: 22, name: 'Hazelnut White Choco', price: '₱85', category: 'Iced Coffee', image: '/white_iced_1788602996843.jpg' },
-  { id: 23, name: 'Butterscotch Mocha', price: '₱85', category: 'Iced Coffee', image: '/mocha_iced_1788602984203.jpg' },
+  { id: 17, name: 'Iced Vanilla Latte', price: '₱135', category: 'Iced Coffee', image: '/vanilla_latte.jpg?v=4' },
+  { id: 18, name: 'Iced Caramel Latte', price: '₱135', category: 'Iced Coffee', image: '/caramel_latte.jpg?v=4' },
+  { id: 19, name: 'Iced Americano', price: '₱100', category: 'Iced Coffee', image: '/americano.jpg?v=4' },
+  { id: 20, name: 'Iced Caramel Macchiato', price: '₱135', category: 'Iced Coffee', image: '/caramel_macchiato.jpg?v=4' },
+  { id: 21, name: 'Spanish Latte', price: '₱135', category: 'Iced Coffee', image: '/spanish_latte.jpg?v=4' },
+  { id: 22, name: 'Iced Mocha Latte', price: '₱135', category: 'Iced Coffee', image: '/mocha_latte.jpg?v=4' },
 
   // --- HOT COFFEE ---
   { id: 24, name: 'Americano', price: '₱50', category: 'Hot Coffee', image: '/black_hot_1788603011976.jpg' },
   { id: 25, name: 'French Vanilla Hot', price: '₱75', category: 'Hot Coffee', image: '/vanilla_hot_1788603164515.jpg' },
-  { id: 27, name: 'Cafe Latte', price: '₱75', category: 'Hot Coffee', image: '/vanilla_hot_1788603164515.jpg' },
   { id: 28, name: 'Salted Caramel Hot', price: '₱85', category: 'Hot Coffee', image: '/caramel_hot_1788603319348.jpg' },
 
-  // --- PASTRIES ---
-  { id: 30, name: 'Chocolate Cake Loaf', price: '₱180', category: 'Pastries', image: imgs.cake },
-  { id: 31, name: 'Ube Cake Loaf', price: '₱185', category: 'Pastries', image: imgs.cake },
-  { id: 32, name: 'Carrot Cake Loaf', price: '₱190', category: 'Pastries', image: imgs.cake },
-  { id: 33, name: 'Banana Cake Loaf', price: '₱175', category: 'Pastries', image: imgs.cake }
+  // --- SNACKS ---
+  { id: 30, name: 'Hashbrown', price: '₱40', category: 'Snacks', image: '/hashbrown.jpg' },
+  { id: 31, name: 'Gyoza', price: '₱88', category: 'Snacks', image: '/gyoza.jpg' },
+  { id: 32, name: 'Carrot Cake Loaf', price: '₱190', category: 'Snacks', image: '/carrot_cake.jpg' }
 ];

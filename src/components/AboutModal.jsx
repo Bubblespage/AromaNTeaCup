@@ -35,7 +35,7 @@ export default function AboutModal({ isOpen, onClose }) {
               Welcome to Aroma N Tea Cup! We are passionate about serving the community with the highest quality, hand-crafted coffee and tea beverages.
             </p>
             <p className="modal-subtitle" style={{ marginBottom: '24px' }}>
-              Whether you're looking for a quick morning pick-me-up or a relaxing afternoon treat, we've got you covered with our premium blends and freshly baked pastries.
+              Whether you're looking for a quick morning pick-me-up or a relaxing afternoon treat, we've got you covered with our premium blends and delicious hot snacks.
             </p>
 
             <div className="about-details" style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: '#fafafa', padding: '16px', borderRadius: '16px', border: '1px solid #e8e3df' }}>
@@ -49,7 +49,7 @@ export default function AboutModal({ isOpen, onClose }) {
               </div>
               <div>
                 <strong>✉️ Email</strong>
-                <p style={{ margin: '4px 0 0', color: '#8a7f7b', fontSize: '0.9rem' }}>aromanteacup@gmail.com</p>
+                <p style={{ margin: '4px 0 0', color: '#8a7f7b', fontSize: '0.9rem' }}>{'aromanteacup.orders' + '@' + 'gmail.com'}</p>
               </div>
             </div>
 

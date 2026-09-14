@@ -4,8 +4,6 @@ import { db, storage } from '../firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-const DELIVERY_FEE = 60;
-
 const ZONES = {
   'Carsadang Bago II': [
     'Legian 1', 'Legian 2', 'Montefarro',
@@ -32,10 +30,11 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onOrderSucce
   });
   const [orderNumber, setOrderNumber] = useState('');
 
+  const currentDeliveryFee = selectedSubdivision === 'Legian 1' ? 0 : 60;
   const subtotal = cartItems.reduce((sum, item) => {
     return sum + parseInt(item.price.replace('₱', '')) * item.qty;
   }, 0);
-  const total = subtotal + DELIVERY_FEE;
+  const total = subtotal + currentDeliveryFee;
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -50,16 +49,51 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onOrderSucce
 
   const handlePaymentSubmit = async () => {
     setIsLoading(true);
+    console.log("Starting payment submit...");
     
+    const compressImage = (file) => {
+      return new Promise((resolve, reject) => {
+        console.log("Starting compressImage with file:", file.name, file.size);
+        const img = new window.Image();
+        img.onload = () => {
+          console.log("Image loaded into memory. Drawing to canvas...");
+          URL.revokeObjectURL(img.src);
+          try {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 600;
+            const scaleSize = MAX_WIDTH / img.width;
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scaleSize;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            console.log("Canvas drawn. Exporting to base64...");
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.5);
+            console.log("Export complete!");
+            resolve(dataUrl);
+          } catch (err) {
+            console.error("Canvas error:", err);
+            reject(err);
+          }
+        };
+        img.onerror = (err) => {
+          console.error("Image onerror fired:", err);
+          URL.revokeObjectURL(img.src);
+          reject(new Error("Failed to load image into memory"));
+        };
+        img.src = URL.createObjectURL(file);
+      });
+    };
+
     try {
       const num = Date.now().toString().slice(-6);
       setOrderNumber(`ATC-${num}`);
       
       let screenshotUrl = null;
       if (screenshot) {
-        const screenshotRef = ref(storage, `receipts/ATC-${num}-${Date.now()}`);
-        await uploadBytes(screenshotRef, screenshot);
-        screenshotUrl = await getDownloadURL(screenshotRef);
+        console.log("Compressing image...");
+        const timeout = new Promise((_, r) => setTimeout(() => r(new Error("Image compression timed out")), 15000));
+        screenshotUrl = await Promise.race([compressImage(screenshot), timeout]);
+        console.log("Image compressed successfully.");
       }
 
       const orderData = {
@@ -69,21 +103,27 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onOrderSucce
         refNumber: refNumber || null,
         screenshotUrl: screenshotUrl || null,
         subtotal,
-        deliveryFee: DELIVERY_FEE,
+        deliveryFee: currentDeliveryFee,
         total,
         date: new Date().toISOString(),
         status: form.paymentMethod === 'gcash' ? 'Verify GCash' : 'Preparing',
         userId: currentUser?.uid || null,
       };
 
-      await setDoc(doc(db, 'orders', `ATC-${num}`), orderData);
+      console.log("Saving order to Firestore...", orderData);
+      const timeoutDb = new Promise((_, r) => setTimeout(() => r(new Error("Firestore write timed out! Are you offline?")), 8000));
+      await Promise.race([setDoc(doc(db, 'orders', `ATC-${num}`), orderData), timeoutDb]);
+      console.log("Order saved successfully.");
+
+      // Save order ID for guest tracking
+      localStorage.setItem('lastGuestOrderId', `ATC-${num}`);
 
       setIsLoading(false);
       setStep(4);
     } catch (err) {
       console.error("Error saving order: ", err);
       setIsLoading(false);
-      alert("Failed to place order. Please try again.");
+      alert("Error: " + err.message);
     }
   };
 
@@ -273,7 +313,9 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onOrderSucce
                     </div>
                     <div className="co-b-row">
                       <span>Delivery Fee</span>
-                      <strong className="fee-badge">₱{DELIVERY_FEE.toFixed(2)}</strong>
+                      <strong className="fee-badge">
+                        {currentDeliveryFee === 0 ? 'FREE' : `₱${currentDeliveryFee.toFixed(2)}`}
+                      </strong>
                     </div>
                     <div className="co-b-row co-b-total">
                       <span>Grand Total:</span>

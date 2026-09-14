@@ -120,8 +120,8 @@ function App() {
   });
 
   const handleAddToCart = (item) => {
-    // Intercept items that are not pastries and haven't been customized yet
-    if (item.category !== 'Pastries' && !item.customizations) {
+    // Intercept items that are not snacks and haven't been customized yet
+    if (item.category !== 'Snacks' && !item.customizations) {
       setSelectedItemForCustomization(item);
       setEditingCartItemId(null);
       setIsCustomizationOpen(true);
@@ -293,13 +293,13 @@ function App() {
               <img src="/logo.jpg" alt="Aroma N Tea Cup Logo" className="footer-logo-img" />
               <h3>Aroma N Tea Cup</h3>
             </div>
-            <p>Experience the finest blends crafted just for you. Whether you're looking for a quick morning pick-me-up or a relaxing afternoon treat, we've got you covered with our premium handcrafted beverages and freshly baked pastries.</p>
+            <p>Experience the finest blends crafted just for you. Whether you're looking for a quick morning pick-me-up or a relaxing afternoon treat, we've got you covered with our premium handcrafted beverages and delicious snacks.</p>
           </div>
           <div className="footer-links">
             <h4>Contact Us</h4>
             <p>📍 Carsadang Bago II, Imus Cavite</p>
             <p>📞 09950829180</p>
-            <p>✉️ aromanteacup@gmail.com</p>
+            <p>✉️ {'aromanteacup.orders' + '@' + 'gmail.com'}</p>
           </div>
           <div className="footer-social">
             <h4>Follow Us</h4>

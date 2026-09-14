@@ -3,6 +3,8 @@ import { LayoutDashboard, ListOrdered, LogOut, Search, Clock, CheckCircle, Packa
 import { db } from '../firebase';
 import { collection, onSnapshot, doc, updateDoc, setDoc, getDocs, deleteDoc } from 'firebase/firestore';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export default function AdminDashboard({ onSignOut }) {
   const [activeTab, setActiveTab] = useState('live_orders');
@@ -23,6 +25,10 @@ export default function AdminDashboard({ onSignOut }) {
 
   // GCash Verify Modal State
   const [verifyModalOrder, setVerifyModalOrder] = useState(null);
+
+  // Additional Modals State
+  const [detailsModalOrder, setDetailsModalOrder] = useState(null);
+  const [imageModalUrl, setImageModalUrl] = useState(null);
 
   // Live Orders Filter State
   const [orderFilter, setOrderFilter] = useState('All');
@@ -130,6 +136,40 @@ export default function AdminDashboard({ onSignOut }) {
     setIsSavingSettings(false);
   };
 
+  const exportOrdersToPDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text('Aroma & Tea - Live Orders Report', 14, 22);
+    
+    doc.setFontSize(11);
+    doc.setTextColor(100);
+    doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30);
+    
+    const tableColumn = ["Order ID", "Date", "Customer", "Items", "Amount", "Status"];
+    const tableRows = [];
+    
+    orders.forEach(order => {
+      const orderId = order.id.startsWith('ATC') ? order.id : `#ATC-${order.id}`;
+      const date = new Date(order.date).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      const customer = `${order.customer?.name} (${order.customer?.phone})`;
+      const items = order.items?.map(i => `${i.qty}x ${i.name}`).join('\n') || '';
+      const amount = `PHP ${order.total?.toFixed(2)}`;
+      const status = order.status;
+      
+      tableRows.push([orderId, date, customer, items, amount, status]);
+    });
+    
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 40,
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [212, 154, 68] },
+    });
+    
+    doc.save('Aroma_Tea_Orders_Report.pdf');
+  };
+
   // Derived Stats for Dashboard
   const totalOrders = orders.length;
   const totalRevenue = orders.reduce((sum, order) => sum + (order.total || 0), 0);
@@ -206,7 +246,7 @@ export default function AdminDashboard({ onSignOut }) {
             <div className="dashboard-wrapper">
               <div className="tab-header-flex">
                 <h2>Dashboard Overview</h2>
-                <button className="export-btn">📥 Export PDF</button>
+                <button className="export-btn" onClick={exportOrdersToPDF}>📥 Export PDF</button>
               </div>
 
               <div className="admin-stats-grid">
@@ -273,7 +313,7 @@ export default function AdminDashboard({ onSignOut }) {
                 <div className="pipeline-header">
                   <h2>Live Kitchen Pipeline</h2>
                   <div className="pipeline-filters">
-                    <button className="export-btn-outline">📥 Export PDF</button>
+                    <button className="export-btn-outline" onClick={exportOrdersToPDF}>📥 Export PDF</button>
                   </div>
                 </div>
 
@@ -326,11 +366,11 @@ export default function AdminDashboard({ onSignOut }) {
                           </td>
                           <td>
                             <div className="action-buttons">
-                              <button className="icon-btn-outline"><FileText size={16} /></button>
+                              <button className="icon-btn-outline" onClick={() => setDetailsModalOrder(order)}><FileText size={16} /></button>
                               {order.screenshotUrl && (
-                                <a href={order.screenshotUrl} target="_blank" rel="noopener noreferrer" className="icon-btn-outline" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', color: 'inherit' }}>
+                                <button className="icon-btn-outline" onClick={() => setImageModalUrl(order.screenshotUrl)}>
                                   <Image size={16} />
-                                </a>
+                                </button>
                               )}
                               {order.status === 'Verify GCash' && (
                                 <button className="track-btn" style={{ background: '#d97706' }} onClick={() => setVerifyModalOrder(order)}>Verify Pay</button>
@@ -482,7 +522,7 @@ export default function AdminDashboard({ onSignOut }) {
                   <option value="Frappe">Frappe</option>
                   <option value="Iced Coffee">Iced Coffee</option>
                   <option value="Hot Coffee">Hot Coffee</option>
-                  <option value="Pastries">Pastries</option>
+                  <option value="Snacks">Snacks</option>
                 </select>
               </div>
               <div className="form-group">
@@ -500,11 +540,11 @@ export default function AdminDashboard({ onSignOut }) {
       {/* GCash Verification Modal */}
       {verifyModalOrder && (
         <div className="modal-overlay" onClick={() => setVerifyModalOrder(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '450px' }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '400px', padding: '24px' }}>
             <button className="modal-close" onClick={() => setVerifyModalOrder(null)}>
               <X size={24} />
             </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
               <div style={{ background: '#f5f1ed', padding: '10px', borderRadius: '12px', color: '#3a2a22' }}>
                 <CheckCircle size={24} />
               </div>
@@ -525,10 +565,10 @@ export default function AdminDashboard({ onSignOut }) {
             )}
 
             {verifyModalOrder.screenshotUrl ? (
-              <div style={{ marginBottom: '24px' }}>
+              <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '1px', color: '#3a2a22', marginBottom: '8px' }}>CUSTOMER PAYMENT SCREENSHOT</label>
                 <div style={{ background: '#f9f9f9', padding: '8px', borderRadius: '16px', border: '1px solid #e0e0e0', position: 'relative' }}>
-                  <img src={verifyModalOrder.screenshotUrl} alt="GCash Receipt" style={{ width: '100%', borderRadius: '12px', maxHeight: '350px', objectFit: 'contain' }} />
+                  <img src={verifyModalOrder.screenshotUrl} alt="GCash Receipt" style={{ width: '100%', borderRadius: '12px', maxHeight: '250px', objectFit: 'contain' }} />
                 </div>
                 <p style={{ fontSize: '0.8rem', color: '#8a7f7b', marginTop: '8px', fontStyle: 'italic' }}>Tap the image in a new tab to zoom in</p>
               </div>
@@ -541,17 +581,67 @@ export default function AdminDashboard({ onSignOut }) {
             <div style={{ display: 'flex', gap: '12px' }}>
               <button 
                 onClick={() => setVerifyModalOrder(null)}
-                style={{ flex: 1, padding: '14px', borderRadius: '12px', background: 'transparent', border: '1px solid #e0e0e0', color: '#3a2a22', fontWeight: 'bold' }}
+                style={{ flex: 1, padding: '10px', borderRadius: '12px', background: 'transparent', border: '1px solid #e0e0e0', color: '#3a2a22', fontWeight: 'bold', fontSize: '0.9rem' }}
               >
                 Cancel
               </button>
               <button 
                 onClick={handleVerifyConfirm}
-                style={{ flex: 1, padding: '14px', borderRadius: '12px', background: '#3a2a22', color: 'white', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}
+                style={{ flex: 1, padding: '10px', borderRadius: '12px', background: '#3a2a22', color: 'white', fontWeight: 'bold', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}
               >
-                Confirm & Prepare Order
+                Confirm & Prepare
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      {/* Details Modal */}
+      {detailsModalOrder && (
+        <div className="modal-overlay" onClick={() => setDetailsModalOrder(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+            <button className="modal-close" onClick={() => setDetailsModalOrder(null)}>
+              <X size={24} />
+            </button>
+            <h2 className="modal-title" style={{ marginBottom: '20px' }}>Order Details</h2>
+            <div style={{ marginBottom: '16px' }}>
+              <strong>Order ID:</strong> {detailsModalOrder.id.startsWith('ATC') ? detailsModalOrder.id : `#ATC-${detailsModalOrder.id}`}
+            </div>
+            <div style={{ marginBottom: '16px' }}>
+              <strong>Customer:</strong> {detailsModalOrder.customer?.name} ({detailsModalOrder.customer?.phone})
+            </div>
+            <div style={{ marginBottom: '16px' }}>
+              <strong>Items:</strong>
+              <ul style={{ paddingLeft: '20px', marginTop: '8px' }}>
+                {detailsModalOrder.items?.map((item, idx) => (
+                  <li key={idx}>{item.qty}x {item.name}</li>
+                ))}
+              </ul>
+            </div>
+            <div style={{ marginBottom: '16px' }}>
+              <strong>Total Amount:</strong> ₱{detailsModalOrder.total?.toFixed(2)}
+            </div>
+            <div style={{ marginBottom: '16px' }}>
+              <strong>Status:</strong> {detailsModalOrder.status}
+            </div>
+            <button className="auth-submit-btn" onClick={() => setDetailsModalOrder(null)} style={{ marginTop: '20px' }}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Image Modal */}
+      {imageModalUrl && (
+        <div className="modal-overlay" onClick={() => setImageModalUrl(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '400px', padding: '24px' }}>
+            <button className="modal-close" onClick={() => setImageModalUrl(null)}>
+              <X size={24} />
+            </button>
+            <h2 className="modal-title" style={{ marginBottom: '20px', fontSize: '1.2rem' }}>Payment Screenshot</h2>
+            <img src={imageModalUrl} alt="Screenshot" style={{ width: '100%', borderRadius: '12px', maxHeight: '400px', objectFit: 'contain' }} />
+            <button className="auth-submit-btn" onClick={() => setImageModalUrl(null)} style={{ marginTop: '20px' }}>
+              Close
+            </button>
           </div>
         </div>
       )}

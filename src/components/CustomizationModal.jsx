@@ -28,11 +28,54 @@ export default function CustomizationModal({ isOpen, onClose, item, onAddToCart,
     );
   };
 
+  const availableAddons = [];
+  if (['Frappe', 'Iced Coffee', 'Hot Coffee'].includes(item.category)) {
+    availableAddons.push({ name: 'Extra Shot', price: 30 });
+  }
+
+  const nameLower = item.name.toLowerCase();
+  if (nameLower.includes('americano')) {
+    // Americano only gets Extra Shot, no extra syrups
+  } else if (nameLower.includes('oreo cheesecake')) {
+    availableAddons.push({ name: 'Cheesecake', price: 20 });
+  } else if (nameLower.includes('cookies and cream') || nameLower.includes('cookies & cream')) {
+    availableAddons.push({ name: 'Cookie Crumbs', price: 20 });
+  } else if (nameLower.includes('choco java')) {
+    availableAddons.push({ name: 'Chocolate Syrup', price: 20 });
+  } else if (nameLower.includes('vanilla') || nameLower.includes('spanish')) {
+    availableAddons.push({ name: 'Vanilla Syrup', price: 20 });
+  } else if (nameLower.includes('caramel')) {
+    availableAddons.push({ name: 'Caramel Drizzle', price: 20 });
+  } else if (nameLower.includes('mocha') || nameLower.includes('chocolate') || nameLower.includes('oreo')) {
+    availableAddons.push({ name: 'Chocolate Sauce', price: 20 });
+  } else {
+    // For plain coffees like Cafe Latte, offer standard syrups just in case
+    availableAddons.push({ name: 'Vanilla Syrup', price: 20 });
+    availableAddons.push({ name: 'Caramel Syrup', price: 20 });
+  }
+
+  if (item.category === 'Frappe') {
+    availableAddons.push({ name: 'Whipped Cream Peak', price: 20 });
+  }
+
+  const ADDON_PRICES = {
+    'Extra Shot': 30,
+    'Vanilla Syrup': 20,
+    'Caramel Syrup': 20,
+    'Caramel Drizzle': 20,
+    'Chocolate Sauce': 20,
+    'Chocolate Syrup': 20,
+    'Whipped Cream Peak': 20,
+    'Cheesecake': 20,
+    'Cookie Crumbs': 20
+  };
+
   // Base price + size upcharge + addon upcharges
   let currentPrice = parseInt(item.price.replace(/[^0-9]/g, ''), 10);
   if (size === '22oz') currentPrice += 21;
-  if (addons.includes('Extra Shot')) currentPrice += 30;
-  if (addons.includes('Vanilla Syrup')) currentPrice += 20;
+  addons.forEach(addon => {
+    if (ADDON_PRICES[addon]) currentPrice += ADDON_PRICES[addon];
+  });
 
   const handleConfirm = () => {
     const customizedItem = {
@@ -103,29 +146,24 @@ export default function CustomizationModal({ isOpen, onClose, item, onAddToCart,
             </div>
           )}
 
-          <div style={{ marginBottom: '32px' }}>
-            <h4 style={{ marginBottom: '12px', fontSize: '1rem', color: 'var(--color-text)' }}>Add-ons</h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', borderRadius: '12px', border: '1px solid #e8e3df', cursor: 'pointer' }}>
-                <span style={{ fontWeight: '500' }}>Extra Shot (+₱30)</span>
-                <input 
-                  type="checkbox" 
-                  checked={addons.includes('Extra Shot')}
-                  onChange={() => handleAddonToggle('Extra Shot')}
-                  style={{ width: '18px', height: '18px', accentColor: 'var(--color-primary)' }}
-                />
-              </label>
-              <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', borderRadius: '12px', border: '1px solid #e8e3df', cursor: 'pointer' }}>
-                <span style={{ fontWeight: '500' }}>Vanilla Syrup (+₱20)</span>
-                <input 
-                  type="checkbox" 
-                  checked={addons.includes('Vanilla Syrup')}
-                  onChange={() => handleAddonToggle('Vanilla Syrup')}
-                  style={{ width: '18px', height: '18px', accentColor: 'var(--color-primary)' }}
-                />
-              </label>
+          {availableAddons.length > 0 && (
+            <div style={{ marginBottom: '32px' }}>
+              <h4 style={{ marginBottom: '12px', fontSize: '1rem', color: 'var(--color-text)' }}>Add-ons</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {availableAddons.map((addon) => (
+                  <label key={addon.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', borderRadius: '12px', border: '1px solid #e8e3df', cursor: 'pointer' }}>
+                    <span style={{ fontWeight: '500' }}>{addon.name} (+₱{addon.price})</span>
+                    <input 
+                      type="checkbox" 
+                      checked={addons.includes(addon.name)}
+                      onChange={() => handleAddonToggle(addon.name)}
+                      style={{ width: '18px', height: '18px', accentColor: 'var(--color-primary)' }}
+                    />
+                  </label>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <button 
             className="auth-submit-btn" 

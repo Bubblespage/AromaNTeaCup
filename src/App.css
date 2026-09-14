@@ -4227,11 +4227,11 @@
   background: var(--color-primary);
   color: white;
   border: none;
-  padding: 8px 16px;
+  padding: 6px 12px;
   border-radius: 20px;
   font-weight: 600;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
 }
 
 /* Dashboard Stats */
@@ -4391,11 +4391,14 @@
 }
 
 .status-pill {
-  display: inline-block;
-  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 16px;
   border-radius: 20px;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 700;
+  white-space: nowrap;
 }
 .status-pill.delivered {
   background: #f1f5f9;
@@ -4427,13 +4430,13 @@
   justify-content: center;
 }
 .track-btn {
-  padding: 8px 16px;
+  padding: 6px 12px;
   border-radius: 8px;
   border: 1px solid var(--color-primary);
   background: var(--color-surface);
   color: var(--color-primary);
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   cursor: pointer;
 }
 .track-btn:hover {

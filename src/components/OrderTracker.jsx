@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { X, RefreshCcw, FileText, Coffee, Car, Home } from 'lucide-react';
 import { db } from '../firebase';
-import { collection, query, orderBy, limit, onSnapshot, where } from 'firebase/firestore';
+import { collection, query, orderBy, limit, onSnapshot, where, doc } from 'firebase/firestore';
 
 export default function OrderTracker({ isOpen, onClose, currentUser }) {
   const [latestOrder, setLatestOrder] = useState(null);
@@ -15,6 +15,17 @@ export default function OrderTracker({ isOpen, onClose, currentUser }) {
     if (!isOpen) return;
 
     if (!currentUser) {
+      const guestId = localStorage.getItem('lastGuestOrderId');
+      if (guestId) {
+        const unsubscribe = onSnapshot(doc(db, 'orders', guestId), (docSnap) => {
+          if (docSnap.exists()) {
+            setLatestOrder({ id: docSnap.id, ...docSnap.data() });
+          } else {
+            setLatestOrder(null);
+          }
+        }, (err) => console.error("Guest Tracker Error:", err));
+        return () => unsubscribe();
+      }
       setLatestOrder(null);
       return;
     }
