@@ -220,7 +220,12 @@ function App() {
   };
 
   if (!authInitialized) {
-    return <div className="app-loading">Loading...</div>; // Or a proper spinner
+    return (
+      <div className="splash-screen">
+        <img src="/logo.jpg" alt="Aroma N Tea Cup Logo" className="splash-logo" />
+        <div className="splash-spinner"></div>
+      </div>
+    );
   }
 
   if (currentUser?.role === 'admin') {

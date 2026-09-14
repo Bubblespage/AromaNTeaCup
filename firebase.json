@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "aromanteacup-ph",
     "public": "dist",
     "ignore": [
       "firebase.json",

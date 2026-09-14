@@ -325,6 +325,7 @@
   border-radius: 24px 24px 0 0;
   z-index: 100;
   box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+  background-color: var(--color-surface);
 }
 
 .nav-item {
@@ -4563,5 +4564,45 @@ input:checked + .slider:before {
 }
 .input-prefix {
   font-size: 1.2rem;
+}
+
+/* Splash Screen */
+.splash-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--color-background);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+}
+
+.splash-logo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 24px;
+  animation: pulse 2s infinite ease-in-out;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.splash-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(212, 154, 68, 0.2);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(212, 154, 68, 0.4); }
+  70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(212, 154, 68, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(212, 154, 68, 0); }
 }
 

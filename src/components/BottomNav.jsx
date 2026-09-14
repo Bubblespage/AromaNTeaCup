@@ -2,7 +2,7 @@ import { Home, Coffee, User, PhoneCall, Info } from 'lucide-react';
 
 export default function BottomNav({ onHome, onMenu, onProfile, onContact, onAbout }) {
   return (
-    <nav className="bottom-nav glass">
+    <nav className="bottom-nav">
       <button className="nav-item" onClick={onHome}>
         <Home size={24} />
         <span>Home</span>
