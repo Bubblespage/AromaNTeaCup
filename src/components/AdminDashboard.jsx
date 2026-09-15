@@ -36,15 +36,26 @@ export default function AdminDashboard({ onSignOut }) {
   useEffect(() => {
     const ordersRef = collection(db, 'orders');
     const unsubscribeOrders = onSnapshot(ordersRef, (snapshot) => {
-      const fetchedOrders = [];
-      snapshot.forEach((doc) => {
-        fetchedOrders.push({ ...doc.data(), id: doc.id });
-      });
-      // Sort by date descending
-      fetchedOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
-      setOrders(fetchedOrders);
+      try {
+        const fetchedOrders = [];
+        snapshot.forEach((doc) => {
+          fetchedOrders.push({ ...doc.data(), id: doc.id });
+        });
+        // Sort by date descending safely
+        fetchedOrders.sort((a, b) => {
+          const dA = a.date ? new Date(a.date).getTime() : 0;
+          const dB = b.date ? new Date(b.date).getTime() : 0;
+          // Handle potential NaNs just in case
+          if (isNaN(dA) || isNaN(dB)) return 0;
+          return dB - dA;
+        });
+        setOrders(fetchedOrders);
+      } catch (err) {
+        console.error("Error processing orders inside snapshot:", err);
+      }
     }, (err) => {
       console.error("Admin order fetch error:", err);
+      alert("Admin Dashboard Error fetching orders: " + err.message + "\n\nTip: You might need to update or publish your Firestore Rules!");
     });
 
     const productsRef = collection(db, 'products');
@@ -54,6 +65,9 @@ export default function AdminDashboard({ onSignOut }) {
         fetchedProducts.push({ id: doc.id, ...doc.data() });
       });
       setProducts(fetchedProducts);
+    }, (err) => {
+      console.error("Admin products fetch error:", err);
+      alert("Admin Dashboard Error fetching products: " + err.message);
     });
 
     const settingsRef = doc(db, 'settings', 'storefront');
@@ -61,6 +75,8 @@ export default function AdminDashboard({ onSignOut }) {
       if (docSnap.exists()) {
         setStoreSettings(docSnap.data());
       }
+    }, (err) => {
+      console.error("Admin settings fetch error:", err);
     });
 
     return () => {

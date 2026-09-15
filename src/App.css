@@ -2193,6 +2193,7 @@
   backdrop-filter: blur(12px);
   width: 100%;
   max-width: 480px;
+  max-height: 95vh;
   border-radius: 32px;
   overflow: hidden;
   display: flex;
@@ -2202,7 +2203,7 @@
 }
 
 .gcash-header {
-  padding: 24px 32px 0;
+  padding: 20px 32px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2238,7 +2239,8 @@
 }
 
 .gcash-content {
-  padding: 20px 40px 40px;
+  padding: 16px 32px 24px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2256,11 +2258,11 @@
   color: var(--color-text);
   font-weight: 800;
   font-size: 1.05rem;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .gcash-qr-box {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   background: white;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(212, 154, 68, 0.08); /* Primary color shadow */
@@ -2272,16 +2274,16 @@
 }
 
 .gcash-qr-box img {
-  width: 260px;
-  height: 260px;
+  width: 180px;
+  height: 180px;
   object-fit: cover;
 }
 
 .gcash-amount-text {
   color: var(--color-primary);
   font-weight: 800;
-  font-size: 2.2rem;
-  margin-bottom: 32px;
+  font-size: 1.8rem;
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2348,7 +2350,7 @@
   font-weight: 700;
   font-size: 0.95rem;
   cursor: pointer;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   transition: all 0.2s;
 }
 
@@ -2425,7 +2427,7 @@
   border-radius: 32px;
   width: 100%;
   max-width: 440px;
-  padding: 48px 36px;
+  padding: 32px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2435,30 +2437,30 @@
 }
 
 .co-success-icon {
-  width: 88px;
-  height: 88px;
+  width: 64px;
+  height: 64px;
   background: #E8F5E9;
   color: #4CAF50;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   box-shadow: 0 10px 20px rgba(76, 175, 80, 0.15);
 }
 
 .co-success-card h2 {
-  font-size: 2rem;
+  font-size: 1.6rem;
   font-weight: 800;
   color: var(--color-text);
   letter-spacing: -0.5px;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .co-success-sub {
   color: #7a6e69;
-  font-size: 1rem;
-  margin-bottom: 32px;
+  font-size: 0.95rem;
+  margin-bottom: 20px;
   line-height: 1.5;
 }
 
@@ -2513,7 +2515,7 @@
 .co-eta-note {
   font-size: 0.95rem;
   color: #8c7b74;
-  margin-bottom: 32px;
+  margin-bottom: 20px;
 }
 
 .co-eta-note strong {

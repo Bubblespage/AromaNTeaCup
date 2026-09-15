@@ -103,7 +103,7 @@ export default function CustomizationModal({ isOpen, onClose, item, onAddToCart,
           <X size={24} />
         </button>
         
-        <div style={{ padding: '24px', paddingTop: '32px' }}>
+        <div style={{ padding: '24px', paddingTop: '32px', maxHeight: '85vh', overflowY: 'auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '24px' }}>
             <img 
               src={item.image} 
