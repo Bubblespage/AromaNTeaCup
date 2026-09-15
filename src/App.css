@@ -4311,6 +4311,7 @@
   border-radius: 20px;
   border: 1px solid var(--color-border);
   box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+  overflow: hidden;
 }
 .pipeline-header {
   padding: 24px;
@@ -4348,7 +4349,7 @@
 
 .pipeline-table-wrapper {
   width: 100%;
-  overflow-x: visible;
+  overflow-x: auto;
 }
 .pipeline-table {
   width: 100%;
@@ -4356,17 +4357,17 @@
 }
 .pipeline-table th {
   text-align: left;
-  padding: 12px 16px;
-  font-size: 0.75rem;
+  padding: 8px 10px;
+  font-size: 0.7rem;
   font-weight: 800;
   color: var(--color-text-light);
   text-transform: uppercase;
   border-bottom: 1px solid var(--color-border);
 }
 .pipeline-table td {
-  padding: 12px 16px;
+  padding: 8px 10px;
   border-bottom: 1px solid var(--color-border);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--color-text);
   vertical-align: middle;
 }
@@ -4376,7 +4377,7 @@
   white-space: nowrap;
 }
 .pipeline-table td:nth-child(4) {
-  min-width: 220px;
+  min-width: 160px;
 }
 .pipeline-date {
   font-size: 0.8rem;
