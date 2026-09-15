@@ -34,13 +34,20 @@ export default function AdminDashboard({ onSignOut }) {
   const [orderFilter, setOrderFilter] = useState('All');
 
   useEffect(() => {
-    const ordersRef = collection(db, 'orders');
-    const unsubscribeOrders = onSnapshot(ordersRef, (snapshot) => {
-      try {
-        const fetchedOrders = [];
-        snapshot.forEach((doc) => {
-          fetchedOrders.push({ ...doc.data(), id: doc.id });
-        });
+    let unsubscribeOrders;
+    let unsubscribeProducts;
+    let unsubscribeSettings;
+
+    // Firebase Auth and Firestore internal SDK sync race condition workaround:
+    // Delay the initial fetch by 500ms to ensure Firestore SDK has received the auth token.
+    const timer = setTimeout(() => {
+      const ordersRef = collection(db, 'orders');
+      unsubscribeOrders = onSnapshot(ordersRef, (snapshot) => {
+        try {
+          const fetchedOrders = [];
+          snapshot.forEach((doc) => {
+            fetchedOrders.push({ ...doc.data(), id: doc.id });
+          });
         // Sort by date descending safely
         fetchedOrders.sort((a, b) => {
           const dA = a.date ? new Date(a.date).getTime() : 0;
@@ -59,7 +66,7 @@ export default function AdminDashboard({ onSignOut }) {
     });
 
     const productsRef = collection(db, 'products');
-    const unsubscribeProducts = onSnapshot(productsRef, (snapshot) => {
+    unsubscribeProducts = onSnapshot(productsRef, (snapshot) => {
       const fetchedProducts = [];
       snapshot.forEach((doc) => {
         fetchedProducts.push({ id: doc.id, ...doc.data() });
@@ -71,18 +78,21 @@ export default function AdminDashboard({ onSignOut }) {
     });
 
     const settingsRef = doc(db, 'settings', 'storefront');
-    const unsubscribeSettings = onSnapshot(settingsRef, (docSnap) => {
+    unsubscribeSettings = onSnapshot(settingsRef, (docSnap) => {
       if (docSnap.exists()) {
         setStoreSettings(docSnap.data());
       }
     }, (err) => {
       console.error("Admin settings fetch error:", err);
     });
+    
+    }, 1000); // 1 second delay to ensure auth token is fully available
 
     return () => {
-      unsubscribeOrders();
-      unsubscribeProducts();
-      unsubscribeSettings();
+      clearTimeout(timer);
+      if (unsubscribeOrders) unsubscribeOrders();
+      if (unsubscribeProducts) unsubscribeProducts();
+      if (unsubscribeSettings) unsubscribeSettings();
     };
   }, []);
 
