@@ -389,7 +389,7 @@ export default function AdminDashboard({ onSignOut }) {
                                 </button>
                               )}
                               {order.status === 'Verify GCash' && (
-                                <button className="track-btn" style={{ background: '#d97706' }} onClick={() => setVerifyModalOrder(order)}>Verify Pay</button>
+                                <button className="track-btn" style={{ background: '#d97706', color: 'white', border: 'none', padding: '6px 12px' }} onClick={() => setVerifyModalOrder(order)}>Verify Pay</button>
                               )}
                               {order.status === 'Preparing' && (
                                 <button className="track-btn" onClick={() => updateOrderStatus(order.id, 'Out for Delivery')}>Send Out</button>

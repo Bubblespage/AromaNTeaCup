@@ -4369,7 +4369,10 @@
   border-bottom: 1px solid var(--color-border);
   font-size: 0.9rem;
   color: var(--color-text);
-  vertical-align: top;
+  vertical-align: middle;
+}
+.pipeline-table td:nth-child(2) {
+  white-space: nowrap;
 }
 .pipeline-date {
   font-size: 0.8rem;
