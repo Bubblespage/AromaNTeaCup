@@ -34,6 +34,20 @@ function App() {
   const [isCustomizationOpen, setIsCustomizationOpen] = useState(false);
   const [selectedItemForCustomization, setSelectedItemForCustomization] = useState(null);
   const [editingCartItemId, setEditingCartItemId] = useState(null);
+  
+  // Storefront settings state
+  const [storeSettings, setStoreSettings] = useState({ onlineOrdersAcceptance: true, kitchenStatusMessage: 'Our kitchen is currently closed.' });
+
+  useEffect(() => {
+    const settingsRef = doc(db, 'settings', 'storefront');
+    const unsubscribe = onSnapshot(settingsRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setStoreSettings(docSnap.data());
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
   const [isDashboardOpen, setIsDashboardOpen] = useState(() => {
     return localStorage.getItem('isDashboardOpen') === 'true';
   });
@@ -199,6 +213,10 @@ function App() {
   };
 
   const handleCheckout = () => {
+    if (storeSettings?.onlineOrdersAcceptance === false) {
+      alert(storeSettings.kitchenStatusMessage || "We are currently not accepting online orders right now. Please try again later!");
+      return;
+    }
     setIsCartOpen(false);
     setIsCheckoutOpen(true);
   };
@@ -359,6 +377,7 @@ function App() {
         onDelete={handleDeleteItem}
         onCheckout={handleCheckout}
         onEdit={handleEditCartItem}
+        storeSettings={storeSettings}
       />
       <CheckoutModal
         isOpen={isCheckoutOpen}

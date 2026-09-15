@@ -1,6 +1,6 @@
 import { X, Minus, Plus, ShoppingBag, Trash2, ChevronRight, Pencil } from 'lucide-react';
 
-export default function CartDrawer({ isOpen, onClose, cartItems, onAdd, onRemove, onDelete, onCheckout, onEdit }) {
+export default function CartDrawer({ isOpen, onClose, cartItems, onAdd, onRemove, onDelete, onCheckout, onEdit, storeSettings }) {
   const DELIVERY_FEE = 60;
 
   const handleBrowseMenu = () => {
@@ -111,7 +111,17 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onAdd, onRemove
                 <span className="total-price">₱{total.toLocaleString()}</span>
               </div>
             </div>
-            <button className="checkout-btn" onClick={onCheckout}>
+            {storeSettings?.onlineOrdersAcceptance === false && (
+              <div style={{ background: '#fef2f2', color: '#ef4444', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.9rem', textAlign: 'center', border: '1px solid #fecaca' }}>
+                {storeSettings.kitchenStatusMessage || 'Our kitchen is currently closed. We are not accepting online orders right now.'}
+              </div>
+            )}
+            <button 
+              className="checkout-btn" 
+              onClick={onCheckout}
+              disabled={storeSettings?.onlineOrdersAcceptance === false}
+              style={{ opacity: storeSettings?.onlineOrdersAcceptance === false ? 0.5 : 1, cursor: storeSettings?.onlineOrdersAcceptance === false ? 'not-allowed' : 'pointer' }}
+            >
               Proceed to Checkout
               <ChevronRight size={20} />
             </button>
