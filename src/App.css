@@ -4311,7 +4311,6 @@
   border-radius: 20px;
   border: 1px solid var(--color-border);
   box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-  overflow: hidden;
 }
 .pipeline-header {
   padding: 24px;
@@ -4349,7 +4348,7 @@
 
 .pipeline-table-wrapper {
   width: 100%;
-  overflow-x: auto;
+  overflow-x: visible;
 }
 .pipeline-table {
   width: 100%;
