@@ -30,8 +30,11 @@ service cloud.firestore {
     }
 
     match /orders/{orderId} {
-      // DEBUG: Allow everything to see if the evaluation engine is crashing
-      allow read, write: if true;
+      // 1. Admin can read, update, and delete all orders
+      allow read, write: if isAdmin();
+      
+      // 2. Anyone can create an order (guests placing orders)
+      allow create: if true;
     }
   }
 }
