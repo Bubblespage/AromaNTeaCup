@@ -10,6 +10,7 @@ export default function AdminDashboard({ onSignOut }) {
   const [activeTab, setActiveTab] = useState('live_orders');
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
+  const [selectedOrders, setSelectedOrders] = useState([]);
   
   // Product Modal State
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -147,6 +148,19 @@ export default function AdminDashboard({ onSignOut }) {
     if (verifyModalOrder) {
       await updateOrderStatus(verifyModalOrder.id, 'Preparing');
       setVerifyModalOrder(null);
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (window.confirm(`Are you sure you want to delete ${selectedOrders.length} order(s)? This action cannot be undone.`)) {
+      try {
+        const deletePromises = selectedOrders.map(id => deleteDoc(doc(db, 'orders', id)));
+        await Promise.all(deletePromises);
+        setSelectedOrders([]);
+      } catch (error) {
+        console.error('Error deleting orders:', error);
+        alert('Error deleting orders: ' + error.message);
+      }
     }
   };
 
@@ -339,6 +353,15 @@ export default function AdminDashboard({ onSignOut }) {
                 <div className="pipeline-header">
                   <h2>Live Kitchen Pipeline</h2>
                   <div className="pipeline-filters">
+                    {selectedOrders.length > 0 && (
+                      <button 
+                        className="export-btn-outline" 
+                        style={{ borderColor: '#ef4444', color: '#ef4444', marginRight: '8px' }} 
+                        onClick={handleDeleteSelected}
+                      >
+                        🗑️ Delete Selected ({selectedOrders.length})
+                      </button>
+                    )}
                     <button className="export-btn-outline" onClick={exportOrdersToPDF}>📥 Export PDF</button>
                   </div>
                 </div>
@@ -347,7 +370,16 @@ export default function AdminDashboard({ onSignOut }) {
                   <table className="pipeline-table">
                     <thead>
                       <tr>
-                        <th style={{ width: '40px' }}><input type="checkbox" /></th>
+                        <th style={{ width: '40px' }}>
+                          <input 
+                            type="checkbox" 
+                            checked={selectedOrders.length === orders.length && orders.length > 0}
+                            onChange={(e) => {
+                              if (e.target.checked) setSelectedOrders(orders.map(o => o.id));
+                              else setSelectedOrders([]);
+                            }}
+                          />
+                        </th>
                         <th>ORDER ID</th>
                         <th>CUSTOMER</th>
                         <th>ITEMIZED DETAILS &amp; SPECS</th>
@@ -359,7 +391,16 @@ export default function AdminDashboard({ onSignOut }) {
                     <tbody>
                       {orders.map(order => (
                         <tr key={order.id}>
-                          <td><input type="checkbox" /></td>
+                          <td>
+                            <input 
+                              type="checkbox" 
+                              checked={selectedOrders.includes(order.id)}
+                              onChange={(e) => {
+                                if (e.target.checked) setSelectedOrders([...selectedOrders, order.id]);
+                                else setSelectedOrders(selectedOrders.filter(id => id !== order.id));
+                              }}
+                            />
+                          </td>
                           <td>
                             <strong>{order.id.startsWith('ATC') ? order.id : `#ATC-${order.id}`}</strong>
                             <div className="pipeline-date">{new Date(order.date).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'})}</div>
