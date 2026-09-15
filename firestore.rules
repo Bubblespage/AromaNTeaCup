@@ -4,8 +4,9 @@ service cloud.firestore {
   match /databases/{database}/documents {
     
     function isAdmin() {
-      // DEBUG: Temporarily return true if authenticated to isolate the issue
-      return request.auth != null;
+      return request.auth != null && 
+             request.auth.token.email != null && 
+             request.auth.token.email == 'admin@aroma.com';
     }
 
     function isAuthenticated() {
@@ -29,17 +30,8 @@ service cloud.firestore {
     }
 
     match /orders/{orderId} {
-      // 1. Admin can read, update, and delete all orders
-      allow read, update, delete: if isAdmin();
-      
-      // 2. Authenticated users can read their own orders
-      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
-      
-      // 3. Guests can only fetch a specific order by ID (cannot list all)
-      allow get: if !isAuthenticated() && resource.data.userId == null;
-                 
-      // 4. Anyone can create an order
-      allow create: if true;
+      // DEBUG: Allow everything to see if the evaluation engine is crashing
+      allow read, write: if true;
     }
   }
 }
