@@ -45,8 +45,14 @@ function App() {
   }, [isDashboardOpen]);
 
   useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       if (user) {
+        // Force token refresh to ensure Firestore SDK receives it before rendering Dashboard
+        try {
+          await user.getIdToken(true);
+        } catch (e) {
+          console.error("Token refresh failed:", e);
+        }
         // User is signed in
         setCurrentUser({
           name: user.displayName || 'User',

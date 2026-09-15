@@ -4,9 +4,11 @@ service cloud.firestore {
   match /databases/{database}/documents {
     
     function isAdmin() {
+      // Use matches with regex to allow for case-insensitivity or trailing spaces 
+      // in case the admin account was created with a typo.
       return request.auth != null && 
              request.auth.token.email != null && 
-             request.auth.token.email == 'admin@aroma.com';
+             request.auth.token.email.matches('(?i)^\\s*admin@aroma\\.com\\s*$');
     }
 
     function isAuthenticated() {
