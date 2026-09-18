@@ -38,6 +38,5 @@ export const menuItems = [
 
   // --- SNACKS ---
   { id: 30, name: 'Hashbrown', price: '₱40', category: 'Snacks', image: '/hashbrown.jpg' },
-  { id: 31, name: 'Gyoza', price: '₱88', category: 'Snacks', image: '/gyoza.jpg' },
-  { id: 32, name: 'Carrot Cake Loaf', price: '₱190', category: 'Snacks', image: '/carrot_cake.jpg' }
+  { id: 31, name: 'Gyoza', price: '₱88', category: 'Snacks', image: '/gyoza.jpg' }
 ];
